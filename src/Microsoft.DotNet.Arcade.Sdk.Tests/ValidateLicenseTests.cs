@@ -20,16 +20,5 @@ namespace Microsoft.DotNet.Arcade.Sdk.Tests
 
             Assert.True(ValidateLicense.LinesEqual(new[] { "a", "    ", "   b", "xxx", "\t \t" }, new[] { "a", "b    ", "*ignore-line*" }));
         }
-
-        [Fact]
-        public void CausesStackOverflow()
-        {
-            Recursive(0);
-        }
-
-        private void Recursive(int value)
-        {
-            Recursive(++value);
-        }
     }
 }

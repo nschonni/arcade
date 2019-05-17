@@ -1233,6 +1233,7 @@ $@"
             ValidateGeneratedProject(itemsToSign, new Dictionary<string, SignInfo>(), new Dictionary<ExplicitCertificateKey, string>(), s_fileExtensionSignInfo, new string[0]);
         }
 
+<<<<<<< HEAD
         //[Fact]
         //public void CausesStackOverflow()
         //{
@@ -1255,5 +1256,17 @@ $@"
         //{
         //    Assert.True(false);
         //}
+=======
+        [Fact]
+        public void CausesStackOverflow()
+        {
+            Recursive(0);
+        }
+
+        private void Recursive(int value)
+        {
+            Recursive(++value);
+        }
+>>>>>>> moved stack overflow test to a test that will run :P
     }
 }
