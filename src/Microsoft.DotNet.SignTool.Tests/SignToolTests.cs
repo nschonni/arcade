@@ -1247,7 +1247,7 @@ $@"
         [Fact]
         public void CrashingTest()
         {
-            System.Diagnostics.Debugger.Launch();
+            throw new AccessViolationException("crashing test message");
         }
 
         //[Fact]
