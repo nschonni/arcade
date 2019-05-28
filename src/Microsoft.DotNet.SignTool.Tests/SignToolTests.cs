@@ -1234,11 +1234,15 @@ $@"
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> commented out stackoverflow test, added a failing test
         //[Fact]
         //public void CausesStackOverflow()
         //{
         //    Recursive(0);
         //}
+<<<<<<< HEAD
 
         //private void Recursive(int value)
         //{
@@ -1262,10 +1266,18 @@ $@"
         {
             Recursive(0);
         }
+=======
+>>>>>>> commented out stackoverflow test, added a failing test
 
-        private void Recursive(int value)
+        //private void Recursive(int value)
+        //{
+        //    Recursive(++value);
+        //}
+
+        [Fact]
+        public void FailingTest()
         {
-            Recursive(++value);
+            Assert.True(false);
         }
 >>>>>>> moved stack overflow test to a test that will run :P
     }
