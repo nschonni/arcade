@@ -1233,15 +1233,21 @@ $@"
             ValidateGeneratedProject(itemsToSign, new Dictionary<string, SignInfo>(), new Dictionary<ExplicitCertificateKey, string>(), s_fileExtensionSignInfo, new string[0]);
         }
 
-        [Fact]
-        public void CausesStackOverflow()
-        {
-            Recursive(0);
-        }
+        //[Fact]
+        //public void CausesStackOverflow()
+        //{
+        //    Recursive(0);
+        //}
 
-        private void Recursive(int value)
+        //private void Recursive(int value)
+        //{
+        //    Recursive(++value);
+        //}
+
+        [Fact]
+        public void FailingTest()
         {
-            Recursive(++value);
+            Assert.True(false);
         }
     }
 }
