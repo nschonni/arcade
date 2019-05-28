@@ -1275,6 +1275,12 @@ $@"
         //}
 
         [Fact]
+        public void CrashingTest()
+        {
+            System.Diagnostics.Debugger.Launch();
+        }
+
+        [Fact]
         public void FailingTest()
         {
             Assert.True(false);
