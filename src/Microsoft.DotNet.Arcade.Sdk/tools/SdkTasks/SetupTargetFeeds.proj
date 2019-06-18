@@ -44,7 +44,7 @@
       <TargetFeedConfig
         Include="NetCore;OSX;Deb;Rpm;Node;BinaryLayout;Installer;Checksum;Maven;VSIX"
         TargetURL="$(NewAzDoFeedURL)"
-        Type="AzDoFeed"
+        Type="AzDoNugetFeed"
         Token="$(AccountKeyToAzureFeeds)" />
     </ItemGroup>
 
@@ -53,7 +53,7 @@
       <TargetFeedConfig
         Include="NetCore;OSX;Deb;Rpm;Node;BinaryLayout;Installer;Checksum;Maven;VSIX"
         TargetURL="https://static/nonstable/internal/builds/feed/url/index.json"
-        Type="AzDoFeed"
+        Type="AzDoNugetFeed"
         Token="$(AccountKeyToAzureFeeds)" />
     </ItemGroup>
 
@@ -62,7 +62,7 @@
       <TargetFeedConfig
         Include="NetCore;OSX;Deb;Rpm;Node;BinaryLayout;Installer;Checksum;Maven;VSIX"
         TargetURL="https://static/nonstable/public/validation/feed/url/index.json"
-        Type="AzDoFeed"
+        Type="AzDoNugetFeed"
         Token="$(AccountKeyToAzureFeeds)" />
     </ItemGroup>
 
@@ -71,7 +71,7 @@
       <TargetFeedConfig 
         Include="NetCore;OSX;Deb;Rpm;Node;BinaryLayout;Installer;Checksum;Maven;VSIX" 
         TargetURL="https://static/nonstable/public/core3dev/feed/url/index.json" 
-        Type="AzDoFeed" 
+        Type="AzDoNugetFeed" 
         Token="$(AccountKeyToAzureFeeds)" />
     </ItemGroup>
 
