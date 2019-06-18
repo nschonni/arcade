@@ -1,0 +1,79 @@
+<!-- Licensed to the .NET Foundation under one or more agreements. The .NET Foundation licenses this file to you under the MIT license. See the LICENSE file in the project root for more information. -->
+<Project Sdk="Microsoft.NET.Sdk" DefaultTargets="Execute">
+  <!--
+
+    
+    Parameters:
+      - IsInternalBuild
+      - IsStableBuild
+      - ChannelId
+      - RepositoryName
+      - AccountKeyToAzureFeeds
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <Target Name="Execute">
+    <Error Condition="'$(IsStableBuild)' == ''" Text="Parameter 'IsStableBuild' is empty. A boolean value is required." />
+    <Error Condition="'$(IsInternalBuild)' == ''" Text="Parameter 'IsInternalBuild' is empty. A boolean value is required." />
+    <Error Condition="'$(ChannelId)' == ''" Text="Parameter 'ChannelId' is empty. The ID of the target channel id BAR is required." />
+    <Error Condition="'$(RepositoryName)' == ''" Text="Parameter 'RepositoryName' is empty. The name of the repository is needed. Example: arcade, core-fx, arcade-validation, etc." />
+    <Error Condition="'$(AccountKeyToAzureFeeds)' == '' and '$(IsStableBuild)' == 'true'" Text="Parameter 'AccountKeyToAzureFeeds' is empty. The PAT used for creating AzDO feeds is required for publishing stable builds." />
+  
+    <!--
+      When a build is stable we ask `CreateAzureDevOpsFeed` in Tasks.Feed to create a new AzDO feed.
+      That feed will be public/internal depending on whether the build is public/internal.
+    -->
+    <CreateAzureDevOpsFeed 
+        Condition="'$(IsStableBuild)' == 'true'"
+        IsInternal="$(IsInternalBuild)" 
+        RepositoryName="$(RepositoryName)" 
+        CommitSha="$(CommitSha)" 
+        PersonalAccessToken="$(AccountKeyToAzureFeeds)">
+      <Output TaskParameter="TargetFeedURL" PropertyName="NewAzDOFeedURL"/>
+    </CreateAzureDevOpsFeed>
+
+    <!--
+      Here are handled cases where the build is not stable.    
+    -->
+    <PropertyGroup>
+      <!-- Assets for private/non-stable builds are published to a static feed for now. -->
+      <NewAzDOFeedURL Condition="'$(IsStableBuild)' == 'false' AND '$(IsInternalBuild)' == 'true'">https://internal/static/nonstable/builds/feed/url/index.json</NewAzDOFeedURL>
+
+      <!--
+        Below we handle cases where the build is not stable AND public.
+      -->
+      
+      <!-- Public non-stable feed used by Validation Channel. -->
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(ChannelId)' == '9'">https://dotnetfeed.blob.core.windows.net/arcade-validation/index.json</NewAzDOFeedURL>
+
+      <RepoName>$(RepositoryName.ToUpper()</RepoName>
+
+      <!--
+        Right now we only really "publish" in the validation channel and in the `.NET Core 3 Dev` channel.
+        Furthermore, many repos are now publishing to their own feeds. 
+        The code below handle publishing builds to repos own public feed aiming `.NET Core 3 Dev` channel.
+      -->
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'ARCADE'">https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json</NewAzDOFeedURL>
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'ARCADE-VALIDATION'">https://dotnetfeed.blob.core.windows.net/arcade-validation/index.json</NewAzDOFeedURL>
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'ASPNETCORE'">https://dotnetfeed.blob.core.windows.net/aspnet-aspnetcore/index.json</NewAzDOFeedURL>
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'ASPNETCORETOOLING'">https://dotnetfeed.blob.core.windows.net/aspnet-aspnetcore-tooling/index.json</NewAzDOFeedURL>
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'ENTITYFRAMEWORKCORE'">https://dotnetfeed.blob.core.windows.net/aspnet-entityframeworkcore/index.json</NewAzDOFeedURL>
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'ASPNETEXTENSIONS'">https://dotnetfeed.blob.core.windows.net/aspnet-extensions/index.json</NewAzDOFeedURL>
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'CORECLR'">https://dotnetfeed.blob.core.windows.net/dotnet-coreclr/index.json</NewAzDOFeedURL>
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'CORESDK'">https://dotnetfeed.blob.core.windows.net/dotnet-sdk/index.json</NewAzDOFeedURL>
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'TOOLSINTERNAL'">https://dotnetfeed.blob.core.windows.net/dotnet-tools-internal/index.json</NewAzDOFeedURL>
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'TOOLSET'">https://dotnetfeed.blob.core.windows.net/dotnet-toolset/index.json</NewAzDOFeedURL>
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'WINDOWSDESKTOP'">https://dotnetfeed.blob.core.windows.net/dotnet-windowsdesktop/index.json</NewAzDOFeedURL>
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'NUGETCLIENT'">https://dotnetfeed.blob.core.windows.net/nuget-nugetclient/index.json</NewAzDOFeedURL>
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'ASPNETENTITYFRAMEWORK6'">https://dotnetfeed.blob.core.windows.net/aspnet-entityframework6/index.json</NewAzDOFeedURL>
+      <NewAzDOFeedURL Condition="'$(NewAzDOFeedURL)' == '' AND '$(RepoName)' == 'ASPNETBLAZOR'">https://dotnetfeed.blob.core.windows.net/aspnet-blazor/index.json</NewAzDOFeedURL>
+    </PropertyGroup>
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.Build.Tasks.Feed" Version="$(MicrosoftDotNetBuildTasksFeedVersion)" />
+  </ItemGroup>
+</Project>
