@@ -16,7 +16,7 @@
   
   <Target Name="Execute" DependsOnTargets="SetupTargetFeeds">
     <Error Condition="'$(ManifestsBasePath)' == ''" Text="ManifestsBasePath is empty. Please inform full path to asset manifest(s) directory." />
-    <Error Condition="'$(BlobBasePath)' == '' AND '$(PackageBasePath)' == ''" Text="A valid full path to BlobBasePath and PackageBasePath is required." />
+    <Error Condition="'$(BlobBasePath)' == '' OR '$(PackageBasePath)' == ''" Text="A valid full path to BlobBasePath and PackageBasePath is required." />
 
     <ItemGroup>
       <ManifestFiles Include="$(ManifestsBasePath)\*.xml" />

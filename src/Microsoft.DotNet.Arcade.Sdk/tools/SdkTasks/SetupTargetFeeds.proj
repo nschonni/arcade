@@ -1,13 +1,14 @@
 <!-- Licensed to the .NET Foundation under one or more agreements. The .NET Foundation licenses this file to you under the MIT license. See the LICENSE file in the project root for more information. -->
 <Project>
   <!--
-
+    This file main target `SetupTargetFeeds` is used to create an ItemGroup with
+    feed descriptors that will be used for publishing build assets.
     
     Parameters:
       - IsInternalBuild
       - IsStableBuild
       - ChannelId
-      - AccountKeyToAzureFeeds
+      - TargetFeedPAT
   -->
 
   <Target Name="SetupTargetFeeds">
@@ -24,8 +25,8 @@
       Text="Parameter 'ChannelId' is empty. The ID of the target channel id BAR is required." />
     
     <Error 
-      Condition="'$(AccountKeyToAzureFeeds)' == '' and '$(IsStableBuild)' == 'true'" 
-      Text="Parameter 'AccountKeyToAzureFeeds' is empty. The PAT used for creating AzDO feeds is required for publishing stable builds." />
+      Condition="'$(TargetFeedPAT)' == '' and '$(IsStableBuild)' == 'true'" 
+      Text="Parameter 'TargetFeedPAT' is empty. The PAT used for creating AzDO feeds is required for publishing stable builds." />
   
     <!--
       When a build is stable we ask `CreateAzureDevOpsFeed` in Tasks.Feed to create a new AzDO feed.
@@ -36,7 +37,7 @@
         IsInternal="$(IsInternalBuild)" 
         RepositoryName="$(RepositoryName)" 
         CommitSha="$(CommitSha)" 
-        PersonalAccessToken="$(AccountKeyToAzureFeeds)">
+        PersonalAccessToken="$(TargetFeedPAT)">
       <Output TaskParameter="TargetFeedURL" PropertyName="NewAzDoFeedURL"/>
     </CreateAzureDevOpsFeed>
 
@@ -45,7 +46,7 @@
         Include="NetCore;OSX;Deb;Rpm;Node;BinaryLayout;Installer;Checksum;Maven;VSIX"
         TargetURL="$(NewAzDoFeedURL)"
         Type="AzDoNugetFeed"
-        Token="$(AccountKeyToAzureFeeds)" />
+        Token="$(TargetFeedPAT)" />
     </ItemGroup>
 
     <!-- Assets for non-stable AND Internal builds are published to a static feed for now. -->
@@ -54,7 +55,7 @@
         Include="NetCore;OSX;Deb;Rpm;Node;BinaryLayout;Installer;Checksum;Maven;VSIX"
         TargetURL="https://static/nonstable/internal/builds/feed/url/index.json"
         Type="AzDoNugetFeed"
-        Token="$(AccountKeyToAzureFeeds)" />
+        Token="$(TargetFeedPAT)" />
     </ItemGroup>
 
     <!-- Public non-stable feed used by `Validation` Channel. -->
@@ -63,7 +64,7 @@
         Include="NetCore;OSX;Deb;Rpm;Node;BinaryLayout;Installer;Checksum;Maven;VSIX"
         TargetURL="https://static/nonstable/public/validation/feed/url/index.json"
         Type="AzDoNugetFeed"
-        Token="$(AccountKeyToAzureFeeds)" />
+        Token="$(TargetFeedPAT)" />
     </ItemGroup>
 
     <!-- Public non-stable feed used by `.NET Core 3 Dev` Channel. -->
@@ -72,7 +73,7 @@
         Include="NetCore;OSX;Deb;Rpm;Node;BinaryLayout;Installer;Checksum;Maven;VSIX" 
         TargetURL="https://static/nonstable/public/core3dev/feed/url/index.json" 
         Type="AzDoNugetFeed" 
-        Token="$(AccountKeyToAzureFeeds)" />
+        Token="$(TargetFeedPAT)" />
     </ItemGroup>
 
     <Error

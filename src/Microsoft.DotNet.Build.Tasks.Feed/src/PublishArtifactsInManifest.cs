@@ -91,7 +91,7 @@ namespace Microsoft.DotNet.Build.Tasks.Feed
         {
             try
             {
-                Log.LogMessage(MessageImportance.High, "Performing push feeds.");
+                Log.LogMessage(MessageImportance.High, "Publishing artifacts to feed.");
 
                 if (string.IsNullOrWhiteSpace(AssetManifestPath) || !File.Exists(AssetManifestPath))
                 {
@@ -146,78 +146,11 @@ namespace Microsoft.DotNet.Build.Tasks.Feed
                     return false;
                 }
 
-                foreach (var packageAsset in buildModel.Artifacts.Packages)
-                {
-                    string categories = string.Empty;
+                SplitArtifactsInCategories(buildModel);
 
-                    if (!packageAsset.Attributes.TryGetValue("Category", out categories))
-                    {
-                        categories = InferCategory(packageAsset.Id);
-                    }
+                await HandlePackagePublishingAsync(client, buildInformation);
 
-                    foreach (var category in categories.Split(';').Select(c => c.ToUpper()))
-                    {
-                        if (PackagesByCategory.ContainsKey(category))
-                        {
-                            PackagesByCategory[category].Add(packageAsset);
-                        }
-                        else
-                        {
-                            PackagesByCategory[category] = new List<PackageArtifactModel>() { packageAsset };
-                        }
-                    }
-                }
-
-                foreach (var blobAsset in buildModel.Artifacts.Blobs)
-                {
-                    string categories = string.Empty;
-
-                    if (!blobAsset.Attributes.TryGetValue("Category", out categories))
-                    {
-                        categories = InferCategory(blobAsset.Id);
-                    }
-
-                    foreach (var category in categories.Split(';'))
-                    {
-                        if (BlobsByCategory.ContainsKey(category))
-                        {
-                            BlobsByCategory[category].Add(blobAsset);
-                        }
-                        else
-                        {
-                            BlobsByCategory[category] = new List<BlobArtifactModel>() { blobAsset };
-                        }
-                    }
-                }
-
-                foreach (var packagesPerCategory in PackagesByCategory)
-                {
-                    var category = packagesPerCategory.Key;
-                    var packages = packagesPerCategory.Value;
-
-                    if (FeedConfigs.TryGetValue(category, out FeedConfig feedConfig))
-                    {
-                        var feedType = feedConfig.Type.ToUpper();
-
-                        if (feedType.Equals("AZDONUGETFEED"))
-                        {
-                            await PublishPackagesToAzDoNugetFeedAsync(packages, client, buildInformation, feedConfig);
-                        }
-                        else if (feedType.Equals("AZURESTORAGEFEED"))
-                        {
-                            await PublishPackagesToAzureStorageNugetFeedAsync(packages, client, buildInformation, feedConfig);
-                        }
-                        else
-                        {
-                            Log.LogError($"Unknown target feed type for category '{category}': '{feedType}'.");
-                        }
-                    }
-                    else
-                    {
-                        Log.LogError($"No target feed configuration found for artifact category: '{category}'.");
-                    }
-                }
-
+                await HandleBlobPublishingAsync(client, buildInformation);
             }
             catch (Exception e)
             {
@@ -225,6 +158,89 @@ namespace Microsoft.DotNet.Build.Tasks.Feed
             }
 
             return !Log.HasLoggedErrors;
+        }
+
+        private async Task HandlePackagePublishingAsync(IMaestroApi client, Maestro.Client.Models.Build buildInformation)
+        {
+            foreach (var packagesPerCategory in PackagesByCategory)
+            {
+                var category = packagesPerCategory.Key;
+                var packages = packagesPerCategory.Value;
+
+                if (FeedConfigs.TryGetValue(category, out FeedConfig feedConfig))
+                {
+                    var feedType = feedConfig.Type.ToUpper();
+
+                    if (feedType.Equals("AZDONUGETFEED"))
+                    {
+                        await PublishPackagesToAzDoNugetFeedAsync(packages, client, buildInformation, feedConfig);
+                    }
+                    else if (feedType.Equals("AZURESTORAGEFEED"))
+                    {
+                        await PublishPackagesToAzureStorageNugetFeedAsync(packages, client, buildInformation, feedConfig);
+                    }
+                    else
+                    {
+                        Log.LogError($"Unknown target feed type for category '{category}': '{feedType}'.");
+                    }
+                }
+                else
+                {
+                    Log.LogError($"No target feed configuration found for artifact category: '{category}'.");
+                }
+            }
+        }
+
+        private async Task HandleBlobPublishingAsync(IMaestroApi client, Maestro.Client.Models.Build buildInformation)
+        {
+            await Task.Delay(1);
+        }
+
+        private void SplitArtifactsInCategories(BuildModel buildModel)
+        {
+            foreach (var packageAsset in buildModel.Artifacts.Packages)
+            {
+                string categories = string.Empty;
+
+                if (!packageAsset.Attributes.TryGetValue("Category", out categories))
+                {
+                    categories = InferCategory(packageAsset.Id);
+                }
+
+                foreach (var category in categories.Split(';').Select(c => c.ToUpper()))
+                {
+                    if (PackagesByCategory.ContainsKey(category))
+                    {
+                        PackagesByCategory[category].Add(packageAsset);
+                    }
+                    else
+                    {
+                        PackagesByCategory[category] = new List<PackageArtifactModel>() { packageAsset };
+                    }
+                }
+            }
+
+            foreach (var blobAsset in buildModel.Artifacts.Blobs)
+            {
+                string categories = string.Empty;
+
+                if (!blobAsset.Attributes.TryGetValue("Category", out categories))
+                {
+                    categories = InferCategory(blobAsset.Id);
+                }
+
+                foreach (var category in categories.Split(';'))
+                {
+                    if (BlobsByCategory.ContainsKey(category))
+                    {
+                        BlobsByCategory[category].Add(blobAsset);
+                    }
+                    else
+                    {
+                        BlobsByCategory[category] = new List<BlobArtifactModel>() { blobAsset };
+                    }
+                }
+            }
         }
 
         private async Task PublishPackagesToAzDoNugetFeedAsync(List<PackageArtifactModel> packagesToPublish, 
@@ -256,38 +272,6 @@ namespace Microsoft.DotNet.Build.Tasks.Feed
 
                 await client.Assets.AddAssetLocationToAssetAsync(assetRecord.Id, AddAssetLocationToAssetAssetLocationType.NugetFeed, feedConfig.TargetFeedURL);
             }
-        }
-
-        private Task<int> PublishWithNugetAsync(FeedConfig feedConfig, PackageArtifactModel package)
-        {
-            var packageFullPath = $"{PackageAssetsBasePath}{Path.DirectorySeparatorChar}{package.Id}.{package.Version}.nupkg";
-
-            var tcs = new TaskCompletionSource<int>();
-
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo()
-                {
-                    FileName = NugetPath,
-                    Arguments = $"push -Source {feedConfig.TargetFeedURL} -apikey {feedConfig.FeedKey} {packageFullPath}",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true
-                },
-                EnableRaisingEvents = true
-            };
-
-            process.Exited += (sender, args) =>
-            {
-                tcs.SetResult(process.ExitCode);
-                string line = process.StandardError.ReadLine();
-                process.Dispose();
-            };
-
-            process.Start();
-
-            return tcs.Task;
         }
 
         private async Task PublishPackagesToAzureStorageNugetFeedAsync(List<PackageArtifactModel> packagesToPublish, 
@@ -331,6 +315,43 @@ namespace Microsoft.DotNet.Build.Tasks.Feed
 
                 await client.Assets.AddAssetLocationToAssetAsync(assetRecord.Id, AddAssetLocationToAssetAssetLocationType.NugetFeed, feedConfig.TargetFeedURL);
             }
+        }
+
+        private Task<int> PublishWithNugetAsync(FeedConfig feedConfig, PackageArtifactModel package)
+        {
+            var packageFullPath = $"{PackageAssetsBasePath}{Path.DirectorySeparatorChar}{package.Id}.{package.Version}.nupkg";
+
+            var tcs = new TaskCompletionSource<int>();
+
+            Log.LogMessage($"Publishing package {packageFullPath} to target feed {feedConfig.TargetFeedURL} with nuget.exe push");
+
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = NugetPath,
+                    Arguments = $"push -Source {feedConfig.TargetFeedURL} -apikey {feedConfig.FeedKey} {packageFullPath}",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                },
+                EnableRaisingEvents = true
+            };
+
+            process.Exited += (sender, args) =>
+            {
+                tcs.SetResult(process.ExitCode);
+                if (process.ExitCode != 0)
+                {
+                    Log.LogError($"Nuget push failed with exit code {process.ExitCode}. Standard error output: {process.StandardError.ReadToEnd()}");
+                }
+                process.Dispose();
+            };
+
+            process.Start();
+
+            return tcs.Task;
         }
 
         private string InferCategory(string assetId)
