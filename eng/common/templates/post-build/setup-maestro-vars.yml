@@ -24,3 +24,9 @@ jobs:
           $Channels = ""
           Get-Content "$(Build.StagingDirectory)/ReleaseConfigs/Channels.txt" | ForEach-Object { $Channels += "$_ ," }
           Write-PipelineSetVariable -Name 'InitialChannels' -Value "$Channels"
+
+          $IsInternalBuild = Get-Content "$(Build.StagingDirectory)/ReleaseConfigs/IsInternalBuild.txt" 
+          Write-PipelineSetVariable -Name 'IsInternalBuild' -Value $IsInternalBuild
+
+          $IsStableBuild = Get-Content "$(Build.StagingDirectory)/ReleaseConfigs/IsStableBuild.txt" 
+          Write-PipelineSetVariable -Name 'IsStableBuild' -Value $IsStableBuild
