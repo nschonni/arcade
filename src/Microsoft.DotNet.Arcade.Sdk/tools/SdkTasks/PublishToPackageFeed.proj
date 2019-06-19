@@ -10,6 +10,7 @@
       - BARBuildId
       - MaestroApiEndpoint
       - BuildAssetRegistryToken
+      - NugetPath
 
     Parameters required by SetupTargetFeeds.proj:
       - IsInternalBuild
@@ -46,7 +47,8 @@
       BuildAssetRegistryToken="$(BuildAssetRegistryToken)"
       AssetManifestPath="%(ManifestFiles.Identity)"
       BlobAssetsBasePath="$(BlobBasePath)"
-      PackageAssetsBasePath="$(PackageBasePath)" />
+      PackageAssetsBasePath="$(PackageBasePath)" 
+      NugetPath="$(NugetPath)"/>
   </Target>
 
   <ItemGroup>

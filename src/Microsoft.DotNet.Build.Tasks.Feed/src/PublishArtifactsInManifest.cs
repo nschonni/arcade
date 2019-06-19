@@ -346,6 +346,10 @@ namespace Microsoft.DotNet.Build.Tasks.Feed
                 {
                     Log.LogError($"Nuget push failed with exit code {process.ExitCode}. Standard error output: {process.StandardError.ReadToEnd()}");
                 }
+                else
+                {
+                    Log.LogMessage($"Successfully published package {packageFullPath} to {feedConfig.TargetFeedURL}");
+                }
                 process.Dispose();
             };
 

@@ -53,7 +53,7 @@
     <ItemGroup Condition="'@(TargetFeedConfig)' == '' AND '$(IsInternalBuild)' == 'true'">
       <TargetFeedConfig
         Include="NetCore;OSX;Deb;Rpm;Node;BinaryLayout;Installer;Checksum;Maven;VSIX"
-        TargetURL="https://static/nonstable/internal/builds/feed/url/index.json"
+        TargetURL="https://dnceng.pkgs.visualstudio.com/_packaging/cesar-static-nonstable-internal/nuget/v3/index.json"
         Type="AzDoNugetFeed"
         Token="$(TargetFeedPAT)" />
     </ItemGroup>
@@ -62,7 +62,7 @@
     <ItemGroup Condition="'@(TargetFeedConfig)' == '' AND '$(ChannelId)' == '9'">
       <TargetFeedConfig
         Include="NetCore;OSX;Deb;Rpm;Node;BinaryLayout;Installer;Checksum;Maven;VSIX"
-        TargetURL="https://static/nonstable/public/validation/feed/url/index.json"
+        TargetURL="https://dnceng.pkgs.visualstudio.com/_packaging/cesar-static-nonstable-public-validation/nuget/v3/index.json"
         Type="AzDoNugetFeed"
         Token="$(TargetFeedPAT)" />
     </ItemGroup>
@@ -71,7 +71,7 @@
     <ItemGroup Condition="'@(TargetFeedConfig)' == '' AND '$(ChannelId)' == '3'">
       <TargetFeedConfig 
         Include="NetCore;OSX;Deb;Rpm;Node;BinaryLayout;Installer;Checksum;Maven;VSIX" 
-        TargetURL="https://static/nonstable/public/core3dev/feed/url/index.json" 
+        TargetURL="https://dnceng.pkgs.visualstudio.com/_packaging/cesar-static-nonstable-public-core3dev/nuget/v3/index.json" 
         Type="AzDoNugetFeed" 
         Token="$(TargetFeedPAT)" />
     </ItemGroup>

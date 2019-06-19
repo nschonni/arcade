@@ -85,6 +85,7 @@ stages:
             /p:ChannelId=${{ variables.InternalServicing_30_Channel_Id }}
             /p:IsStableBuild=${{ variables.IsStableBuild }}
             /p:IsInternalBuild=${{ variables.IsInternalBuild }}
+            /p:NugetPath=${{ variables.NugetPath }}
             /p:TargetFeedPAT='$(dotnetfeed-storage-access-key-1)' 
             /p:BARBuildId=$(BARBuildId) 
             /p:MaestroApiEndpoint='https://maestro-prod.westus2.cloudapp.azure.com'
