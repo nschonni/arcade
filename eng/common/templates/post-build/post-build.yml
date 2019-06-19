@@ -60,4 +60,4 @@ stages:
 
 - template: \eng\common\templates\post-build\channels\public-release.yml
 
-- template: \eng\common\templates\post-build\channels\internal-release.yml
+- template: \eng\common\templates\post-build\channels\internal-servicing.yml
