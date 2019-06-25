@@ -1233,41 +1233,18 @@ $@"
             ValidateGeneratedProject(itemsToSign, new Dictionary<string, SignInfo>(), new Dictionary<ExplicitCertificateKey, string>(), s_fileExtensionSignInfo, new string[0]);
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> commented out stackoverflow test, added a failing test
-        //[Fact]
-        //public void CausesStackOverflow()
-        //{
-        //    Recursive(0);
-        //}
-<<<<<<< HEAD
-
-        //private void Recursive(int value)
-        //{
-        //    Recursive(++value);
-        //}
-
         [Fact]
         public void CrashingTest()
         {
             throw new AccessViolationException("crashing test message");
         }
 
-        //[Fact]
-        //public void FailingTest()
-        //{
-        //    Assert.True(false);
-        //}
-=======
-        [Fact]
+        /*[Fact]
         public void CausesStackOverflow()
         {
             Recursive(0);
-        }
-=======
->>>>>>> commented out stackoverflow test, added a failing test
+        }*/
+
 
         //private void Recursive(int value)
         //{
@@ -1275,7 +1252,7 @@ $@"
         //}
 
         [Fact]
-        public void CrashingTest()
+        public void CrashingTest2()
         {
             System.Diagnostics.Debugger.Launch();
         }
@@ -1285,6 +1262,6 @@ $@"
         {
             Assert.True(false);
         }
->>>>>>> moved stack overflow test to a test that will run :P
+
     }
 }
