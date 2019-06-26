@@ -57,7 +57,7 @@ def get_uploaded_files(dir):
     for root, dirs, files in os.walk(dir):
         for name in files:
             uri = construct_log_uri(name)
-            path = os.path.join(root, name)
+            path = os.path.join(root[len(get_env("HELIX_WORKITEM_UPLOAD_ROOT"))::], name)
             yield path, uri
 
 
@@ -78,7 +78,7 @@ def add_logs(tr, log_list):
     global total_added_logs
     if tr.result != "Pass" and total_added_logs < 20:
         tr.attachments.append(TestResultAttachment(
-            name=u"Logs.html",
+            name=u"Results.html",
             text=log_list,
         ))
     total_added_logs += 1
