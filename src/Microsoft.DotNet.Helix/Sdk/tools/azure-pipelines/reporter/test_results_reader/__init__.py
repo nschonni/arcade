@@ -57,16 +57,8 @@ def get_uploaded_files(dir):
     for root, dirs, files in os.walk(dir):
         for name in files:
             uri = construct_log_uri(name)
-            yield name, uri
-
-    #for name in os.listdir(dir):
-    #    path = os.path.join(dir, name)
-    #    root, ext = os.path.splitext(path)
-
-    #    print("Found uploaded file'{}'".format(path))
-    #    uri = construct_log_uri(name)
-    #    print("Uri '{}'".format(uri))
-    #    yield name, uri
+            path = os.path.join(root, name)
+            yield path, uri
 
 
 def construct_log_list(log_files):
