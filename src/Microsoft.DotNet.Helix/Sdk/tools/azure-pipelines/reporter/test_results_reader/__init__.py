@@ -56,8 +56,9 @@ def get_uploaded_files(dir):
     print("Searching '{}' for uploaded files".format(dir))
     for root, dirs, files in os.walk(dir):
         for name in files:
+            print("Getting file: '{}'".format(os.path.join(root, name)))
             uri = construct_log_uri(name)
-            path = os.path.join(root[len(get_env("HELIX_WORKITEM_UPLOAD_ROOT"))::], name)
+            path = os.path.join(root[len(get_env("HELIX_WORKITEM_UPLOAD_ROOT") + "..")::], name)
             yield path, uri
 
 
@@ -88,7 +89,7 @@ def read_results(dir):
     # type: (str) -> Iterable[TestResult]
 
     log_files = list(get_log_files(os.path.join(get_env("HELIX_WORKITEM_ROOT"), "..")))
-    log_files.extend(get_uploaded_files(os.path.join(get_env("HELIX_WORKITEM_UPLOAD_ROOT"))))
+    log_files.extend(get_uploaded_files(os.path.join(get_env("HELIX_WORKITEM_UPLOAD_ROOT"), "..")))
     log_list = construct_log_list(log_files)
 
     print("Searching '{}' for test results files".format(dir))
