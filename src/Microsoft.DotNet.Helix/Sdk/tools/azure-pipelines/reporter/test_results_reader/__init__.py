@@ -40,18 +40,6 @@ def construct_log_uri(name):
 
     return uri + '/' + name + '?' + read_sas
 
-
-def get_log_files(dir):
-    print("Searching '{}' for log files".format(dir))
-    for name in os.listdir(dir):
-        path = os.path.join(dir, name)
-        root, ext = os.path.splitext(path)
-        if ext == ".log":
-            print("Found log '{}'".format(path))
-            uri = construct_log_uri(name)
-            print("Uri '{}'".format(uri))
-            yield name, uri
-
 def get_uploaded_files(dir):
     print("Searching '{}' for uploaded files".format(dir))
     for root, dirs, files in os.walk(dir):
@@ -89,8 +77,7 @@ def add_logs(tr, log_list):
 def read_results(dir):
     # type: (str) -> Iterable[TestResult]
 
-    log_files = list(get_log_files(os.path.join(get_env("HELIX_WORKITEM_ROOT"), "..")))
-    log_files.extend(get_uploaded_files(os.path.join(get_env("HELIX_WORKITEM_UPLOAD_ROOT"))))
+    log_files = list(get_uploaded_files(os.path.join(get_env("HELIX_WORKITEM_UPLOAD_ROOT"))))
     log_list = construct_log_list(log_files)
 
     print("Searching '{}' for test results files".format(dir))
