@@ -60,7 +60,7 @@ def get_uploaded_files(dir):
             uri = construct_log_uri(name)
             print("Uri '{}'".format(uri))
             path = os.path.join(root[len(get_env("HELIX_WORKITEM_UPLOAD_ROOT"))::], name)
-            yield name, uri
+            yield path, uri
 
 
 def construct_log_list(log_files):
@@ -89,7 +89,12 @@ def add_logs(tr, log_list):
 def read_results(dir):
     # type: (str) -> Iterable[TestResult]
 
-    log_files = list(get_uploaded_files(os.path.join(get_env("HELIX_WORKITEM_UPLOAD_ROOT"))))
+    #log_files = list(get_log_files(os.path.join(get_env("HELIX_WORKITEM_ROOT"), "..")))
+    log_files = list(get_log_files(os.path.join(get_env("HELIX_WORKITEM_UPLOAD_ROOT"), "..")))
+    print("HELIX_WORKITEM_UPLOAD_ROOT Path: '{}'".format(get_env("HELIX_WORKITEM_UPLOAD_ROOT")))
+    print("HELIX_WORKITEM_UPLOAD_ROOT os.path.join: '{}'".format(os.path.join(get_env("HELIX_WORKITEM_UPLOAD_ROOT"), "..")))
+
+    #log_files.extend(get_uploaded_files(os.path.join(get_env("HELIX_WORKITEM_UPLOAD_ROOT"))))
     log_list = construct_log_list(log_files)
 
     print("Searching '{}' for test results files".format(dir))
