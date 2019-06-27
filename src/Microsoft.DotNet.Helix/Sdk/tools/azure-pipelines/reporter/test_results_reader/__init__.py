@@ -89,8 +89,7 @@ def add_logs(tr, log_list):
 def read_results(dir):
     # type: (str) -> Iterable[TestResult]
 
-    log_files = list(get_log_files(os.path.join(get_env("HELIX_WORKITEM_ROOT"), "..")))
-    log_files.extend(get_uploaded_files(os.path.join(get_env("HELIX_WORKITEM_UPLOAD_ROOT"), "..")))
+    log_files = list(get_uploaded_files(os.path.join(get_env("HELIX_WORKITEM_UPLOAD_ROOT"), "..")))
     log_list = construct_log_list(log_files)
 
     print("Searching '{}' for test results files".format(dir))
