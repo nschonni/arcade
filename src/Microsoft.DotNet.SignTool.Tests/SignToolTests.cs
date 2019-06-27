@@ -4,14 +4,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
-using System.IO.Packaging;
 using System.Linq;
 using Microsoft.Build.Framework;
 using TestUtilities;
 using Xunit;
 using Xunit.Abstractions;
+using System.Net;
+using System.Diagnostics;
 
 namespace Microsoft.DotNet.SignTool.Tests
 {
@@ -1234,33 +1234,25 @@ $@"
         }
 
         [Fact]
-        public void CrashingTest()
+        public void DumpTest()
         {
-            throw new AccessViolationException("crashing test message");
-        }
+            using (var client = new WebClient())
+            {
+                client.DownloadFile("https://helixosauto.blob.core.windows.net/validation-assets/dotnet.zip", "dotnet.zip");
 
-        /*[Fact]
-        public void CausesStackOverflow()
-        {
-            Recursive(0);
-        }*/
+                string extractPath = @".\extract";
+                try
+                {
+                    System.IO.Compression.ZipFile.ExtractToDirectory("dotnet.zip", extractPath);
+                }
+                catch
+                {
 
+                }
 
-        //private void Recursive(int value)
-        //{
-        //    Recursive(++value);
-        //}
+                Process.Start(extractPath + @"\dotnet\dotnet.exe");
 
-        [Fact]
-        public void CrashingTest2()
-        {
-            System.Diagnostics.Debugger.Launch();
-        }
-
-        [Fact]
-        public void FailingTest()
-        {
-            Assert.True(false);
+            }
         }
 
     }
