@@ -60,7 +60,7 @@ def get_uploaded_files(dir):
             uri = construct_log_uri(name)
             print("Uri '{}'".format(uri))
             path = os.path.join(root[len(get_env("HELIX_WORKITEM_UPLOAD_ROOT"))::], name)
-            yield path, uri
+            yield name, uri
 
 
 def construct_log_list(log_files):
