@@ -90,7 +90,7 @@ def read_results(dir):
     # type: (str) -> Iterable[TestResult]
 
     #log_files = list(get_log_files(os.path.join(get_env("HELIX_WORKITEM_ROOT"), "..")))
-    log_files = list(get_uploaded_files(os.path.join(get_env("HELIX_WORKITEM_UPLOAD_ROOT"))))
+    log_files = list(get_uploaded_files(os.path.join(get_env("HELIX_WORKITEM_UPLOAD_ROOT"), "..")))
     print("HELIX_WORKITEM_UPLOAD_ROOT Path: '{}'".format(get_env("HELIX_WORKITEM_UPLOAD_ROOT")))
     print("HELIX_WORKITEM_UPLOAD_ROOT os.path.join: '{}'".format(os.path.join(get_env("HELIX_WORKITEM_UPLOAD_ROOT"), "..")))
 
